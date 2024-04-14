@@ -1,6 +1,5 @@
 extends Control
 
-# Preload textures if they're static and won't change
 var empty_texture = preload("res://assets/empty_bar.png")
 var full_texture = preload("res://assets/health_bar.png")
 
@@ -8,12 +7,12 @@ func _ready():
 	setup_health_units()
 
 func setup_health_units():
-	var offsets = [0]  # Start with the first offset at 0
-	var widths = [17, 16, 16, 16, 16, 17]  # Widths of each box
-	var height = 16  # Assuming height is consistent
+	var offsets = [0]
+	var widths = [17, 16, 16, 16, 16, 17]
+	var height = 16 
 
 	# Calculate offsets based on widths
-	for i in range(1, 6):  # Start from second sprite to last
+	for i in range(1, 6): 
 		offsets.append(offsets[i - 1] + widths[i - 1])
 
 	# Setup each sprite region
