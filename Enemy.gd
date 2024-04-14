@@ -4,6 +4,7 @@ var speed = 90
 var player = null
 
 func _ready():
+	add_to_group("enemies")
 	player = get_node_or_null("/root/GameArena/Player")
 
 func _physics_process(delta):

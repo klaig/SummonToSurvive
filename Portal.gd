@@ -24,5 +24,4 @@ func start_fade_out():
 	tween.start()
 	
 func _on_fade_out_completed(object, key):
-	$FadeTween.disconnect("tween_completed", self, "_on_fade_out_completed")
 	queue_free() 

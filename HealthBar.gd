@@ -18,7 +18,7 @@ func setup_health_units():
 	# Setup each sprite region
 	for i in range(6):
 		var sprite = get_node("HealthUnit" + str(i + 1))
-		sprite.texture = empty_texture  # Set initial texture
+		sprite.texture = full_texture  # Set initial texture
 		sprite.region_enabled = true
 		sprite.region_rect = Rect2(offsets[i], 0, widths[i], height)
 

@@ -38,6 +38,7 @@ position = Vector2( -465, -5 )
 shape = SubResource( 3 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
+collision_mask = 14
 
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource( 3 )
@@ -51,5 +52,5 @@ autostart = true
 [node name="PlayerUI" parent="UILayer" instance=ExtResource( 4 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_right = 480.0
-margin_bottom = 360.0
+margin_right = 800.0
+margin_bottom = 600.0
