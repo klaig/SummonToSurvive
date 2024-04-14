@@ -4,6 +4,8 @@ var speed = 100
 var creature_scene = preload("res://Creature.tscn")
 var portal_scene = preload("res://Portal.tscn")
 var current_portal = null
+var max_health = 50
+var current_health = max_health
 
 func _ready():
 	$AnimatedSprite.play("idle")
