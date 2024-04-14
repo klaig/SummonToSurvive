@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://DeathScreen.gd" type="Script" id=1]
+
+[node name="DeathScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 0.8 )
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+margin_left = 300.0
+margin_top = 200.0
+margin_right = 500.0
+margin_bottom = 200.0
+text = "You died!"
+align = 1
+valign = 1
+uppercase = true
+
+[node name="ButtonTryAgain" type="Button" parent="CanvasLayer"]
+margin_left = 300.0
+margin_top = 250.0
+margin_right = 368.0
+margin_bottom = 270.0
+text = "Try again"
+
+[node name="ButtonExitToMenu" type="Button" parent="CanvasLayer"]
+margin_left = 450.0
+margin_top = 250.0
+margin_right = 485.0
+margin_bottom = 270.0
+text = "Exit"
+
+[connection signal="pressed" from="CanvasLayer/ButtonTryAgain" to="." method="_on_Try_again_pressed"]
+[connection signal="pressed" from="CanvasLayer/ButtonExitToMenu" to="." method="_on_Exit_to_menu_pressed"]

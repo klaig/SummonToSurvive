@@ -14,4 +14,18 @@ margin_right = 550.0
 margin_bottom = 330.0
 text = "Play"
 
+[node name="Instructions" type="Label" parent="."]
+margin_left = 200.0
+margin_top = 100.0
+margin_right = 600.0
+margin_bottom = 200.0
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "Instructions:
+- Use WASD to move.
+- Press 'R' to summon creatures, with a one second cooldown.
+- Avoid enemies and try to survive!"
+align = 1
+valign = 1
+
 [connection signal="pressed" from="PlayButton" to="." method="_on_PlayButton_pressed"]

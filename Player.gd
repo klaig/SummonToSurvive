@@ -10,24 +10,51 @@ var current_health = max_health
 var max_mana = 3
 var current_mana = max_mana
 onready var mana_bar = get_node("/root/GameArena/UILayer/PlayerUI/ManaBar")
+var mana_regeneration_timer = Timer.new()
 var enemy_cooldowns = {}
 var summon_timer = Timer.new()
+var invincible = true 
+var invincibility_duration = 5.0
 
 func _ready():
 	$AnimatedSprite.play("idle")
-	summon_timer.set_wait_time(1.0)  # Set cooldown time to 1 second
+	var invincibility_timer = Timer.new()
+	invincibility_timer.wait_time = invincibility_duration
+	invincibility_timer.one_shot = true
+	invincibility_timer.connect("timeout", self, "_on_Invincibility_timeout")
+	add_child(invincibility_timer)
+	invincibility_timer.start()
+	mana_regeneration_timer.set_wait_time(10)
+	mana_regeneration_timer.set_one_shot(false)  # The timer will keep running
+	mana_regeneration_timer.connect("timeout", self, "_on_Mana_regeneration_timeout")
+	add_child(mana_regeneration_timer)
+	mana_regeneration_timer.start()  # Start the mana regeneration timer
+	summon_timer.set_wait_time(1.0)
 	summon_timer.set_one_shot(true)  # The timer stops after reaching 0
 	add_child(summon_timer)
+
+func _on_Invincibility_timeout():
+	invincible = false
+	
 func take_damage(amount):
+	if invincible:
+		return
 	current_health -= amount
 	current_health = max(current_health, 0)  # Prevent health from going below 0
 	health_bar.update_health(current_health)  # Update the visual health bar
 	if current_health == 0:
 		die()
 
+func _on_Mana_regeneration_timeout():
+	if current_mana < max_mana:
+		current_mana += 1  # Increment mana by 1
+		mana_bar.update_mana(current_mana)  # Update the visual mana bar
+		
 func die():
 	print("Player died")
-	# Add logic for game over or respawning the player
+	var death_screen = preload("res://DeathScreen.tscn").instance()
+	get_tree().root.add_child(death_screen)
+	death_screen.show_death_screen()
 	
 func _physics_process(delta):
 	var motion = get_input_vector() * speed
@@ -73,14 +100,18 @@ func get_input_vector():
 	return vec.normalized()
 
 func summon_portal():
-	if summon_timer.is_stopped():  # Check if the cooldown has finished
+	if summon_timer.is_stopped() and current_mana > 0:  # Check if the cooldown has finished
 		current_portal = portal_scene.instance()
 		get_tree().get_root().add_child(current_portal)
 		current_portal.global_position = global_position + Vector2(50, 0)  # Offset the portal spawn position
 		current_portal.connect("portal_fully_opened", self, "_on_Portal_fully_opened")
 		summon_timer.start()  # Start the cooldown timer
+		current_mana -= 1
+		mana_bar.update_mana(current_mana)
+	elif current_mana == 0:
+		print("Not enough mana")
 	else:
-		print("Summoning on cooldown")  # Optional: feedback for trying to summon too soon
+		print("Summoning on cooldown")
 
 func _on_Portal_fully_opened():
 	current_portal.disconnect("portal_fully_opened", self, "_on_Portal_fully_opened")
