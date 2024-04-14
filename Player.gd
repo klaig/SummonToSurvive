@@ -1,24 +1,21 @@
 extends KinematicBody2D
 
 var speed = 100
-var creature_scene = preload("res://Creature.tscn")  # Make sure this path matches your creature scene
+var creature_scene = preload("res://Creature.tscn")
+var portal_scene = preload("res://Portal.tscn")
+var current_portal = null
 
 func _ready():
 	$AnimatedSprite.play("idle")
 
 func _physics_process(delta):
-	var motion = Vector2.ZERO
-	handle_input(delta)  # Handle movement and summoning
-
-func handle_input(delta):
 	var motion = get_input_vector() * speed
 	move_and_slide(motion)
 
-	if motion == Vector2.ZERO:
+	if motion == Vector2.ZERO and $AnimatedSprite.animation != "idle":
 		$AnimatedSprite.play("idle")
-		
 	if Input.is_action_just_pressed('ui_summon'):
-		summon_creature()
+		summon_portal()
 
 func get_input_vector():
 	var vec = Vector2.ZERO
@@ -36,9 +33,24 @@ func get_input_vector():
 		vec.y -= 1
 	return vec.normalized()
 
-func summon_creature():
-	var creature = creature_scene.instance()
-	get_tree().get_root().add_child(creature)  # Adding directly to the root for global positioning
-	creature.global_position = global_position + Vector2(50, 0)  # Maintain global offset
-	print("Spawned Creature at: ", creature.global_position)
+func summon_portal():
+	current_portal = portal_scene.instance()
+	get_tree().get_root().add_child(current_portal)
+	current_portal.global_position = global_position + Vector2(50, 0)  # Offset the portal spawn position
+	current_portal.connect("portal_fully_opened", self, "_on_Portal_fully_opened")
 
+func _on_Portal_fully_opened():
+	current_portal.disconnect("portal_fully_opened", self, "_on_Portal_fully_opened")
+	summon_creature(current_portal.global_position, current_portal)
+	
+func summon_creature(portal_position, portal):
+	var creature = creature_scene.instance()
+	get_tree().get_root().add_child(creature)
+	creature.global_position = portal_position + Vector2(0, -10)
+	creature.modulate = Color(1, 1, 1, 0)  # Start fully transparent
+	creature.call_deferred("fade_in")
+	creature.connect("fade_in_completed", self, "_on_Creature_fully_visible", [portal])
+	
+func _on_Creature_fully_visible(portal):
+	if is_instance_valid(portal):
+		portal.start_fade_out()
