@@ -3,13 +3,16 @@ extends KinematicBody2D
 signal fade_in_completed
 
 var speed = 80
-var attack_range = 40
+var attack_range = 100
 var target = null
 var target_update_interval = 1.0  # Time in seconds to update target
 var time_since_last_target_update = 0
 var is_fully_visible = false
+var projectile_scene = preload("res://Projectile.tscn")
+var shooting_cooldown = 0.5  # Cooldown in seconds between shots
+var time_since_last_shot = 0.0  # Time tracker for cooldown
 
-	
+
 func _ready():
 	fade_in()
 	if !$DespawnTimer.is_connected("timeout", self, "_on_DespawnTimer_timeout"):
@@ -40,7 +43,7 @@ func find_nearest_enemy():
 func _physics_process(delta):
 	if not is_fully_visible:
 		return  # Do nothing if not fully visible
-		
+	time_since_last_shot += delta
 	time_since_last_target_update += delta
 	if time_since_last_target_update >= target_update_interval or target == null or not is_instance_valid(target):
 		find_nearest_enemy()  # Update target every interval or if target is lost
@@ -48,18 +51,21 @@ func _physics_process(delta):
 
 	move_and_attack()
 
-func attack_enemy(enemy):
-	if is_instance_valid(enemy):
-		enemy.queue_free()  # Deletes the enemy
-		find_nearest_enemy()  # Find a new target after attack
+func shoot(direction):
+	var projectile = projectile_scene.instance()
+	projectile.position = position
+	projectile.direction = direction.normalized()
+	get_parent().add_child(projectile)  # Add the projectile to the game world
 
+	
 func move_and_attack():
 	if target and is_instance_valid(target):
 		var direction = (target.position - position).normalized()
 		var distance = position.distance_to(target.position)
 		move_and_slide(direction * speed)
-		if distance <= attack_range:
-			attack_enemy(target)
+		if distance <= attack_range and time_since_last_shot >= shooting_cooldown:
+			shoot(direction)
+			time_since_last_shot = 0
 		else:
 			find_nearest_enemy()
 
