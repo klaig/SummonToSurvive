@@ -1,12 +1,16 @@
 extends KinematicBody2D
 
+signal enemy_died
+
 var speed = 90
 var player = null
 
 func _ready():
 	add_to_group("enemies")
 	player = get_node_or_null("/root/GameArena/Player")
-
+	if $AnimatedSprite.material:
+		$AnimatedSprite.material = $AnimatedSprite.material.duplicate()
+		
 func _physics_process(delta):
 	if player:
 		var direction = (player.position - position).normalized()
@@ -30,5 +34,5 @@ func hit():
 	particles.emitting = false
 	material.set_shader_param("flash_white", false)
 
-	# Optionally, remove the enemy or perform other cleanup
+	emit_signal("enemy_died")
 	queue_free()
